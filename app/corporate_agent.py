@@ -82,7 +82,7 @@ generate_text = transformers.pipeline(
 query = "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
 llm = HuggingFacePipeline(pipeline=generate_text)
 res = llm(prompt=query)
-print('-----------------Response from Naive LLM--------------------')
+print('----------------------Response from agent powered by Naive LLM-------------------------')
 print(res)
 
 
@@ -100,5 +100,5 @@ chain = ConversationalRetrievalChain.from_llm(llm, papers_vectorstore.as_retriev
 chat_history = []
 
 result = chain({"question": query, "chat_history": chat_history})
-print('-----------------Response from llm@RAG--------------------')
+print('-----------------Response from agent powered by RAG-enhanced Llama-2 model--------------------')
 print(result['answer'])
