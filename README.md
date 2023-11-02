@@ -55,4 +55,15 @@ Start the local Llama-2 model instance and the corporate agent (chat agent):
    The author of the paper is Xing-Yu Zhang, Runze Chi, Yang Liu, and Lei Wang.
 
    ```
+## Contributing
+
+If you're interested in contributing, please follow these steps:
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b {firstname.lastname}-featureName`)
+3. Make your changes.
+4. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the Branch (`git push origin {firstname.lastname}-featureName`)
+6. Open a Pull Request
+
 
