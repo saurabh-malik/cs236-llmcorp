@@ -4,6 +4,10 @@ from transformers import StoppingCriteria, StoppingCriteriaList
 import transformers
 from langchain.llms import HuggingFacePipeline
 
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chains import ConversationalRetrievalChain
+
 model_id = 'meta-llama/Llama-2-13b-chat-hf'
 
 device = f'cuda:{cuda.current_device()}' if cuda.is_available() else 'cpu'
@@ -18,7 +22,7 @@ bnb_config = transformers.BitsAndBytesConfig(
 )
 
 # begin initializing HF items, you need an access token
-hf_auth = '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'
+hf_auth = '#####################'
 model_config = transformers.AutoConfig.from_pretrained(
     model_id,
     use_auth_token=hf_auth
@@ -75,7 +79,26 @@ generate_text = transformers.pipeline(
 )
 
 #res = generate_text("Explain me the difference between Data Lakehouse and Data Warehouse.")
+query = "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
 llm = HuggingFacePipeline(pipeline=generate_text)
-res = llm(prompt="Explain me the difference between Data Lakehouse and Data Warehouse.")
+res = llm(prompt=query)
+print('-----------------Response from Naive LLM--------------------')
 print(res)
-#print(res[0]["generated_text"])
+
+
+######Initiate Vector DB
+model_name = "sentence-transformers/all-mpnet-base-v2"
+model_kwargs = {"device": "cuda"}
+
+embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
+
+papers_vectorstore = FAISS.load_local("faiss_papers_index", embeddings)
+
+######Initializing Chain
+chain = ConversationalRetrievalChain.from_llm(llm, papers_vectorstore.as_retriever(), return_source_documents=True)
+
+chat_history = []
+
+result = chain({"question": query, "chat_history": chat_history})
+print('-----------------Response from llm@RAG--------------------')
+print(result['answer'])
