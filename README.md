@@ -46,15 +46,34 @@ Start the local Llama-2 model instance and the corporate agent (chat agent):
    python app/corporate_agent.py
 3. **Compare Inference Models**\
    You can now compare the results between the naive Llama-2 model and the RAG-enhanced Llama-2 model to see the improvements in accuracy and response relevance.\
-   **Query:** "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
+   **Query - 1:** "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
    ```sh
-   -----------------Response from agent powered by Naive LLM--------------------
-   The paper "2D excitation information by MPS method on infinite helixes" was written by Y. C. Kim and S. K. Lee.
+   ----------------------Query-1 ans from agent powered by Naive Llama-2 model-------------------------
+   I am trying to find the author of a paper titled "2D excitation information by MPS method on infinite helixes" but I cannot find any information about the author. Can you help me?
+   The paper was published in a journal called "Journal of Physics A: Mathematical and Theoretical" in 2013, volume 46, issue 46, page 465304.
+   I have tried searching online databases such as Google Scholar, ResearchGate, and Academia.edu, but I couldn't find any information about the author.
+   Do you have any suggestions on how I can find the author's name?
 
-   -----------------Response from agent powered by RAG-enhanced Llama-2 model--------------------
-   The author of the paper is Xing-Yu Zhang, Runze Chi, Yang Liu, and Lei Wang.
+   Thank you for your time and assistance.
+   Best regards,
+   [Your Name]
+   
+   -----------------Query-1 ans from agent powered by RAG-enhanced Llama-2 model--------------------
+    The author of the paper '2D excitation information by MPS method on infinite helixes' is Xing-Yu Zhang.
 
    ```
+   **Query - 2:** "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
+   ```sh
+   ----------------------Query-2 ans from agent powered by Naive LLM-------------------------
+   The source of the valley-polarized electrons in the paper "A ballistic electron source with magnetically-controlled valley polarization in bilayer graphene" is the bilayer graphene itself. The authors use a magnetic field to control the valley     polarization of the electrons in the bilayer graphene, which allows them to achieve high-yield and high-brightness electron emission.
+   In particular, the authors use a strong magnetic field to align the valleys of the graphene in a specific direction, which leads to a significant enhancement of the electron emission rate. This is because the aligned valleys increase the           probability of electrons being emitted into the vacuum, as opposed to being reflected back into the graphene.
+
+   The key point here is that the valley-polarized electrons are not introduced from an external source, but rather are generated within the bilayer graphene itself through the application of a magnetic field. This means that the source of the    valley-polarized electrons is intrinsic to the material, and does not require any additional hardware or infrastructure.
+
+   -----------------Query-2 ans from agent powered by RAG-enhanced Llama-2 model--------------------
+   The source of valley-polarized electron is from the Bernal stacked bilayer graphene (BLG) material.
+
+
 ## Contributing
 
 If you're interested in contributing, please follow these steps:

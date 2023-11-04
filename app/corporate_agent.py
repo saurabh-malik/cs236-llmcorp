@@ -3,10 +3,17 @@ from torch import cuda, bfloat16
 from transformers import StoppingCriteria, StoppingCriteriaList
 import transformers
 from langchain.llms import HuggingFacePipeline
+import argparse
 
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
+
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--kb', type=str, default='faiss_200_papers_index', help="Vector DB Index for your knowledge base")
+
+args = parser.parse_args()
+
 
 model_id = 'meta-llama/Llama-2-13b-chat-hf'
 
@@ -22,7 +29,7 @@ bnb_config = transformers.BitsAndBytesConfig(
 )
 
 # begin initializing HF items, you need an access token
-hf_auth = '#####################'
+hf_auth = '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'
 model_config = transformers.AutoConfig.from_pretrained(
     model_id,
     use_auth_token=hf_auth
@@ -78,11 +85,14 @@ generate_text = transformers.pipeline(
     repetition_penalty=1.1  # without this output begins repeating
 )
 
-#res = generate_text("Explain me the difference between Data Lakehouse and Data Warehouse.")
-query = "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
 llm = HuggingFacePipeline(pipeline=generate_text)
-res = llm(prompt=query)
-print('----------------------Response from agent powered by Naive LLM-------------------------')
+
+print("###############################################################")
+
+query_1 = "Whos is the author of '2D excitation information by MPS method on infinite helixes' paper?"
+print("Query-1: {}".format(query_1))
+print('----------------------Query-1 ans from agent powered by Naive Llama-2 model-------------------------')
+res = llm(prompt=query_1)
 print(res)
 
 
@@ -92,13 +102,24 @@ model_kwargs = {"device": "cuda"}
 
 embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
 
-papers_vectorstore = FAISS.load_local("faiss_papers_index", embeddings)
+papers_vectorstore = FAISS.load_local(args.kb, embeddings)
 
 ######Initializing Chain
 chain = ConversationalRetrievalChain.from_llm(llm, papers_vectorstore.as_retriever(), return_source_documents=True)
 
 chat_history = []
 
-result = chain({"question": query, "chat_history": chat_history})
-print('-----------------Response from agent powered by RAG-enhanced Llama-2 model--------------------')
+print('-----------------Query-1 ans from agent powered by RAG-enhanced Llama-2 model--------------------')
+result = chain({"question": query_1, "chat_history": chat_history})
+print(result['answer'])
+
+print("###############################################################")
+query_2 = "Where are the source of valley-polarized electron as per the paper: 'A ballistic electron source with magnetically-controlled valley polarization in bilayer graphene' paper."
+print("Query-2: {}".format(query_2))
+print('----------------------Query-2 ans from agent powered by Naive LLM-------------------------')
+res = llm(prompt=query_2)
+print(res)
+
+print('-----------------Query-2 ans from agent powered by RAG-enhanced Llama-2 model--------------------')
+result = chain({"question": query_2, "chat_history": chat_history})
 print(result['answer'])
