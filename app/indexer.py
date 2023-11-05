@@ -7,10 +7,13 @@ from sentence_transformers import SentenceTransformer
 import glob
 
 
+PAPER_DIR = "20-papers"
+
+
 ##Load the pdf documents from data
-loader = DirectoryLoader('./data/papers/200-papers/', glob="**/*.pdf", show_progress=True, use_multithreading=True)
+loader = DirectoryLoader(f'./data/papers/{PAPER_DIR}/', glob="**/*.pdf", show_progress=True, use_multithreading=True)
 documents = loader.load()
-print("Total Files to be loaded: {}".format(len(documents)))
+print("Total Files loaded: {}".format(len(documents)))
 
 
 # Split documents into smaller chunks
@@ -25,4 +28,4 @@ embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwa
 # storing embeddings in the vector store
 vectorstore = FAISS.from_documents(all_splits, embeddings)
 
-vectorstore.save_local("faiss_200_papers_index")
+vectorstore.save_local(f"faiss_{PAPER_DIR.replace('-', '_')}_index")
