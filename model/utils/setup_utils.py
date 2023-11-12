@@ -1,11 +1,10 @@
 import torch
-from customchain.llms import MyHuggingFacePipeline
-from customchain.vectorstores import MyFAISS
+from model.customchain.llms import MyHuggingFacePipeline
+from model.customchain.vectorstores import MyFAISS
 from config import config
 from langchain.embeddings import HuggingFaceEmbeddings
-from fastapi import Depends
 from utils.stopping_criteria import StopOnTokens
-from transformers import StoppingCriteria, StoppingCriteriaList
+from transformers import StoppingCriteriaList
 import transformers
 
 llm = None
