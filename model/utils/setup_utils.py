@@ -3,7 +3,7 @@ from model.customchain.llms import MyHuggingFacePipeline
 from model.customchain.vectorstores import MyFAISS
 from config import config
 from langchain.embeddings import HuggingFaceEmbeddings
-from utils.stopping_criteria import StopOnTokens
+from model.utils.stopping_criteria import StopOnTokens
 from transformers import StoppingCriteriaList
 import transformers
 
