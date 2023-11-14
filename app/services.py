@@ -1,10 +1,7 @@
 import torch
-from fastapi import Depends
-from customchain.chains import MyConversationalRetrievalChain
-from config import config
-from app.dependencies import get_llm, get_vector_db
-from customchain.llms import MyHuggingFacePipeline
-from customchain.vectorstores import MyFAISS
+from model.customchain.chains import MyConversationalRetrievalChain
+from model.utils.setup_utils import get_llm, get_vector_db
+
 
 # Define a service that uses dependencies
 def get_llm_answer(question):
