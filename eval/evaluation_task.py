@@ -60,17 +60,12 @@ class AuthorNameEvaluation(EvaluationTask):
         # TODO: this can be optimized by doing batch inference
         results = []
         with torch.no_grad():
-            count = 0
             for question, _ in tqdm.tqdm(self.question_answers):
-                count += 1
                 try:
                     results.append(self.chain({"question": question, "chat_history": []}))
                 except torch.cuda.OutOfMemoryError:
                     self.logger.warning(f"OutOfMemoryError on {question}: skipping")
                     results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
-
-                if count == 10:
-                    break
 
         all_author_correct = 0
         some_author_correct = 0
