@@ -1,0 +1,11 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA', '.']
+  
+  # Push the Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
+
+images:
+  - 'gcr.io/ai-corp-agent/corp-agent:$SHORT_SHA'
