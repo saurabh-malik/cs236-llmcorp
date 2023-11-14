@@ -8,4 +8,4 @@ steps:
     args: ['push', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
 
 images:
-  - 'gcr.io/ai-corp-agent/corp-agent:$SHORT_SHA'
+  - 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA'
