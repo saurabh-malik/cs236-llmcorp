@@ -5,13 +5,18 @@ metadata:
 spec:
   notification:
     filter: |
-      (build.status == Build.Status.QUEUED && build.substitutions['TRIGGER_NAME'] == 'merge-to-master') ||
+      (build.status == Build.Status.QUEUED) ||
       (build.status == Build.Status.SUCCESS) ||
       (build.status == Build.Status.FAILURE)
     params:
       buildStatus: $(build.status)
       buildId: $(build.id)
-      buildTriggerName: $(build.substitutions['TRIGGER_NAME'])
+      projectId: $(build.projectId)
+      logUrl: $(build.logUrl)
+      triggerName: $(build.substitutions['TRIGGER_NAME'])
+      branchName: $(build.substitutions['BRANCH_NAME'])
+      shortSha: $(build.substitutions['SHORT_SHA'])
+      createTimeSeconds: $(build.createTime.seconds)
     delivery:
       webhookUrl:
         secretRef: slack-webhook-url

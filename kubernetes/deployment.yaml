@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: ai-agent
-        image: gcr.io/ai-corp-agent/ai-agent:a76467a
+        image: gcr.io/ai-corp-agent/ai-agent:${BUILD_NUMBER}
         resources:
           limits:
             nvidia.com/gpu: 1 # requesting 1 GPU
         ports:
-        - containerPort: 5000
+        - containerPort: 8000
