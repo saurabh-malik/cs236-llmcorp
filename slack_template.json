@@ -1,0 +1,60 @@
+[
+    {
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": "Cloud Build Notification - llmcorp"
+        }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*Project:* {{.Build.ProjectId}}\n*Build ID:* {{.Build.Id}}\n*Status:* {{.Params.buildStatus}}"
+        }
+    },
+    {
+        "type": "divider"
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Build details for the *llmcorp* project. Click the button below to view build logs and more information."
+        }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "View Build Logs"
+        },
+        "accessory": {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "View Logs"
+            },
+            "url": "{{.Build.LogUrl}}",
+            "action_id": "view_logs"
+        }
+    },
+    {
+        "type": "context",
+        "elements": [
+            {
+                "type": "mrkdwn",
+                "text": "Trigger: {{.Build.TriggerName}} | Branch: {{.Build.Substitutions.BRANCH_NAME}} | Commit: {{.Build.Substitutions.SHORT_SHA}}"
+            }
+        ]
+    },
+    {
+        "type": "context",
+        "elements": [
+            {
+                "type": "mrkdwn",
+                "text": "<!date^{{.Build.CreateTime.Seconds}}^{date_num} {time_secs}|Build Time>"
+            }
+        ]
+    }
+]

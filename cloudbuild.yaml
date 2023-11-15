@@ -2,14 +2,22 @@ steps:
   # Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA', '.']
-  
+
   # Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
 
-  # Set up kubectl
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['set', 'image', 'deployment/ai-agent-deployment', 'ai-agent=gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
+  # Check for the existence of the deployment and update if it exists
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if kubectl get deployment ai-agent-deployment; then
+          kubectl set image deployment/ai-agent-deployment ai-agent=gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA
+        else
+          echo "Deployment not found, skipping image update."
+        fi
     env: ['CLOUDSDK_COMPUTE_ZONE=us-west4-a', 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4']
 
   # Apply the Kubernetes configurations
