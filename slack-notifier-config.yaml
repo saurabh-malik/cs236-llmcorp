@@ -10,13 +10,9 @@ spec:
       (build.status == Build.Status.FAILURE)
     params:
       buildStatus: $(build.status)
-      buildId: $(build.id)
-      projectId: $(build.projectId)
-      logUrl: $(build.logUrl)
       triggerName: $(build.substitutions['TRIGGER_NAME'])
       branchName: $(build.substitutions['BRANCH_NAME'])
       shortSha: $(build.substitutions['SHORT_SHA'])
-      createTimeSeconds: $(build.createTime.seconds)
     delivery:
       webhookUrl:
         secretRef: slack-webhook-url
