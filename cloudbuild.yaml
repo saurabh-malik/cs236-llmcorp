@@ -7,5 +7,14 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
 
+  # Set up kubectl
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['set', 'image', 'deployment/ai-agent-deployment', 'ai-agent=gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
+    env: ['CLOUDSDK_COMPUTE_ZONE=us-west4-a', 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4']
+
+  # Apply the Kubernetes configurations
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'kubernetes/']
+
 images:
   - 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA'
