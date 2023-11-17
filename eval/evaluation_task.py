@@ -57,7 +57,7 @@ class AuthorNameEvaluationNoRAG(EvaluationTask):
                     start_runtime = datetime.datetime.now()
                     results.append(self.llm.prompt(question))
                     end_runtime = datetime.datetime.now()
-                    total_runtime += end_runtime - start_runtime
+                    total_runtime += (end_runtime - start_runtime).total_seconds()
                 except torch.cuda.OutOfMemoryError:
                     self.logger.warning(f"OutOfMemoryError on {question}: skipping")
                     results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
@@ -161,7 +161,7 @@ class AuthorNameEvaluation(EvaluationTask):
                     start_runtime = datetime.datetime.now()
                     results.append(self.chain({"question": question, "chat_history": []}))
                     end_runtime = datetime.datetime.now()
-                    total_runtime += end_runtime - start_runtime
+                    total_runtime += (end_runtime - start_runtime).total_seconds()
                 except torch.cuda.OutOfMemoryError:
                     self.logger.warning(f"OutOfMemoryError on {question}: skipping")
                     results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
