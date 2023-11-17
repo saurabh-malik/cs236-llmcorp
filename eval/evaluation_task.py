@@ -30,6 +30,100 @@ class EvaluationTask(abc.ABC):
         raise NotImplementedError
 
 
+class AuthorNameEvaluationNoRAG(EvaluationTask):
+    def __init__(self, name: str, exp_dir: str, exp_split: DataSplitGroup):
+        super().__init__(name=name)
+        self.exp_dir = exp_dir
+        self.exp_split = exp_split
+        self.llm = None
+
+        self.device_name = torch.cuda.get_device_name() if torch.cuda.is_available() else 'cpu'
+        self.question_answers = None
+        self.report = {}
+
+    def setup(self):
+        self.question_answers = self._prepare_author_name_test_set()
+        os.makedirs(self.exp_dir)
+
+        self.llm = get_llm()  # Obtain the MyHuggingFacePipeline object from the dependency
+
+    def run(self):
+        # TODO: this can be optimized by doing batch inference
+        results = []
+        total_runtime = 0
+        with torch.no_grad():
+            for question, _ in tqdm.tqdm(self.question_answers):
+                try:
+                    start_runtime = datetime.datetime.now()
+                    results.append(self.llm.prompt(question))
+                    end_runtime = datetime.datetime.now()
+                    total_runtime += end_runtime - start_runtime
+                except torch.cuda.OutOfMemoryError:
+                    self.logger.warning(f"OutOfMemoryError on {question}: skipping")
+                    results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
+
+        all_author_correct = 0
+        some_author_correct = 0
+        none_author_correct = 0
+        error_count = 0
+        total_count = 0
+        for result, (question, ref_authors) in zip(results, self.question_answers):
+            # 2. log details
+            # convert data in results to string
+            for k, v in result.items():
+                result[k] = str(v)
+            result['ref_authors'] = ref_authors
+
+            # 1. accumulate counts
+            total_count += 1
+            if 'error' in result:
+                error_count += 1
+                result['result'] = 'ERROR'
+                continue
+
+            direct_answer = result['answer']
+            if all([author_name.lower() in direct_answer.lower() for author_name in ref_authors]):
+                all_author_correct += 1
+                result['result'] = 'SUCCESS'
+            elif all([author_name.lower() not in direct_answer.lower() for author_name in ref_authors]):
+                none_author_correct += 1
+                result['result'] = 'FAIL'
+            else:
+                some_author_correct += 1
+                result['result'] = 'PARTIAL'
+
+        with open(f"{self.exp_dir}/results.json", 'w') as writer:
+            json.dump(results, writer, indent=4)
+
+        self.report = {
+            'total': total_count,
+            'all_correct': all_author_correct,
+            'some_author_correct': some_author_correct,
+            'non_author_correct': none_author_correct,
+            'error_count': error_count,
+            'total_runtime': total_runtime
+        }
+
+    def dump_result_json(self):
+        with open(f"{self.exp_dir}/report.json", 'w') as writer:
+            json.dump(self.report, writer, indent=4)
+
+    def _prepare_author_name_test_set(self):
+        all_paper_author_names = []
+        for paper_group_idx in self.exp_split.value:
+            paper_author_names = get_paper_and_author_names_by_group_idx(paper_group_idx)
+            all_paper_author_names.extend(paper_author_names)
+
+        question_answers = []
+        for paper_name, author_names in all_paper_author_names:
+            question = f"Who are the authors of paper {paper_name}?"
+            question_answers.append((question, author_names))
+
+        return question_answers
+
+
+
+
 class AuthorNameEvaluation(EvaluationTask):
     def __init__(self, name: str, exp_dir: str, exp_split: DataSplitGroup,
                  chain: MyConversationalRetrievalChain = None):
