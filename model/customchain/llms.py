@@ -71,12 +71,12 @@ class MyHuggingFacePipeline:
 
     def prompt(self, text):
         # SM ToDO: Need to implement later for now just simple prompt, without chat history
-        prompt = {
-            "question": text,
-            "chat_history": []
-        }
+        # prompt = {
+        #     "question": text,
+        #     "chat_history": []
+        # }
         # Pass the prompt dictionary to the LLM model
-        response = self.pipeline(prompt=prompt)
+        response = self.pipeline(prompt=text)
 
         #SM ToDO - Also need to do post-processing later to solve long context.
         # response = post_processing(response)
