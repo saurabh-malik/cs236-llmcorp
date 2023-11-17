@@ -4,6 +4,7 @@ import os
 
 import torch
 import tqdm
+import datetime
 
 from model.customchain.chains import MyConversationalRetrievalChain
 from model.utils.data_utils import DataSplitGroup, get_paper_and_author_names_by_group_idx
@@ -59,10 +60,14 @@ class AuthorNameEvaluation(EvaluationTask):
     def run(self):
         # TODO: this can be optimized by doing batch inference
         results = []
+        total_runtime = 0
         with torch.no_grad():
             for question, _ in tqdm.tqdm(self.question_answers):
                 try:
+                    start_runtime = datetime.datetime.now()
                     results.append(self.chain({"question": question, "chat_history": []}))
+                    end_runtime = datetime.datetime.now()
+                    total_runtime += end_runtime - start_runtime
                 except torch.cuda.OutOfMemoryError:
                     self.logger.warning(f"OutOfMemoryError on {question}: skipping")
                     results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
@@ -105,7 +110,8 @@ class AuthorNameEvaluation(EvaluationTask):
             'all_correct': all_author_correct,
             'some_author_correct': some_author_correct,
             'non_author_correct': none_author_correct,
-            'error_count': error_count
+            'error_count': error_count,
+            'total_runtime': total_runtime
         }
 
     def dump_result_json(self):
