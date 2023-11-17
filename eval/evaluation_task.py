@@ -67,12 +67,14 @@ class AuthorNameEvaluationNoRAG(EvaluationTask):
         none_author_correct = 0
         error_count = 0
         total_count = 0
-        for result, (question, ref_authors) in zip(results, self.question_answers):
+        result_dict = []
+        for direct_answer, (question, ref_authors) in zip(results, self.question_answers):
+            result = {
+                'ref_authors': ref_authors,
+                'answer': direct_answer
+            }
             # 2. log details
             # convert data in results to string
-            for k, v in result.items():
-                result[k] = str(v)
-            result['ref_authors'] = ref_authors
 
             # 1. accumulate counts
             total_count += 1
@@ -81,7 +83,6 @@ class AuthorNameEvaluationNoRAG(EvaluationTask):
                 result['result'] = 'ERROR'
                 continue
 
-            direct_answer = result['answer']
             if all([author_name.lower() in direct_answer.lower() for author_name in ref_authors]):
                 all_author_correct += 1
                 result['result'] = 'SUCCESS'
@@ -92,6 +93,7 @@ class AuthorNameEvaluationNoRAG(EvaluationTask):
                 some_author_correct += 1
                 result['result'] = 'PARTIAL'
 
+            result_dict.append(result)
         with open(f"{self.exp_dir}/results.json", 'w') as writer:
             json.dump(results, writer, indent=4)
 
