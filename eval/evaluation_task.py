@@ -4,6 +4,7 @@ import os
 
 import torch
 import tqdm
+import datetime
 
 from model.customchain.chains import MyConversationalRetrievalChain
 from model.utils.data_utils import DataSplitGroup, get_paper_and_author_names_by_group_idx
@@ -56,13 +57,20 @@ class AuthorNameEvaluation(EvaluationTask):
         self.chain = MyConversationalRetrievalChain.from_llm(llm.pipeline, vector_db.as_retriever(),
                                                              return_source_documents=True)
 
+    def _get_result(self, question):
+        return self.chain({"question": question, "chat_history": []})
+
     def run(self):
         # TODO: this can be optimized by doing batch inference
         results = []
+        total_runtime = 0
         with torch.no_grad():
             for question, _ in tqdm.tqdm(self.question_answers):
                 try:
-                    results.append(self.chain({"question": question, "chat_history": []}))
+                    start_runtime = datetime.datetime.now()
+                    results.append(self._get_result(question))
+                    end_runtime = datetime.datetime.now()
+                    total_runtime += (end_runtime - start_runtime).total_seconds()
                 except torch.cuda.OutOfMemoryError:
                     self.logger.warning(f"OutOfMemoryError on {question}: skipping")
                     results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
@@ -105,7 +113,8 @@ class AuthorNameEvaluation(EvaluationTask):
             'all_correct': all_author_correct,
             'some_author_correct': some_author_correct,
             'non_author_correct': none_author_correct,
-            'error_count': error_count
+            'error_count': error_count,
+            'total_runtime': total_runtime
         }
 
     def dump_result_json(self):
@@ -125,3 +134,19 @@ class AuthorNameEvaluation(EvaluationTask):
 
         return question_answers
 
+
+class AuthorNameEvaluationNoRAG(AuthorNameEvaluation):
+    def __init__(self, name: str, exp_dir: str, exp_split: DataSplitGroup):
+        super().__init__(name=name, exp_dir=exp_dir, exp_split=exp_split)
+        self.llm = None
+
+    def setup(self):
+        self.question_answers = self._prepare_author_name_test_set()
+        os.makedirs(self.exp_dir)
+
+        self.llm = get_llm()  # Obtain the MyHuggingFacePipeline object from the dependency
+
+    def _get_result(self, question):
+        return {
+            'answer': self.llm.prompt(question)
+        }
