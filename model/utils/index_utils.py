@@ -3,19 +3,26 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores.faiss import FAISS
 
+def get_default_embedding_model():
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {"device": "cuda"}
+    embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
+    return embeddings
 
-def index_documents(folder_dir: str, index_save_dir: str):
+
+def get_document_splits(folder_dir):
     loader = DirectoryLoader(folder_dir, glob="**/*.pdf", show_progress=True, use_multithreading=True)
     documents = loader.load()
-
     # Split documents into smaller chunks
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
     all_splits = text_splitter.split_documents(documents)
+    return all_splits, documents
 
-    model_name = "sentence-transformers/all-mpnet-base-v2"
-    model_kwargs = {"device": "cuda"}
 
-    embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
+def index_documents(folder_dir: str, index_save_dir: str):
+    all_splits, documents = get_document_splits(folder_dir)
+
+    embeddings = get_default_embedding_model()
 
     # storing embeddings in the vector store
     vectorstore = FAISS.from_documents(all_splits, embeddings)
@@ -23,3 +30,20 @@ def index_documents(folder_dir: str, index_save_dir: str):
     vectorstore.save_local(index_save_dir)
 
     return len(documents)
+
+
+def add_to_existing_index(current_index_dir: str, new_doc_folder_dir: str, index_save_dir: str = None):
+    # Load current index
+    embeddings = get_default_embedding_model()
+    db = FAISS.load_local(current_index_dir, embeddings)
+
+    # Index new documents
+    all_splits, documents = get_document_splits(new_doc_folder_dir)
+    new_db = FAISS.from_documents(all_splits, embeddings)
+
+    # Merge dbs
+    db.merge_from(new_db)
+    db.save_local(index_save_dir if index_save_dir else current_index_dir)
+
+    return len(documents)
+
