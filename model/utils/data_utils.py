@@ -40,5 +40,18 @@ def get_paper_and_author_names_by_group_idx(idx: int) -> List[Tuple[str, List[st
     return zipped_info
 
 
+def get_paper_and_abstracts_by_group_idx(idx: int) -> List[Tuple[str, List[str]]]:
+    df = pd.read_csv(DATA_METAINFO_FILE, delimiter='\t')
+
+    papers_of_group = df[df['group'] == idx]
+
+    all_paper_names = papers_of_group['title'].tolist()
+    all_paper_abstracts = papers_of_group['abstract'].tolist()
+
+    zipped_info = [(paper_name, paper_abstract) for paper_name, paper_abstract in zip(all_paper_names, all_paper_abstracts)]
+
+    return zipped_info
+
+
 def get_paper_names_by_split(split: DataSplitGroup) -> List[str]:
     return functools.reduce(lambda x, y: x+y, [get_paper_names_by_group_idx(idx) for idx in split.value], [])
