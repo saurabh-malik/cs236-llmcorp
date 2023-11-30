@@ -296,3 +296,78 @@ class AuthorCountEvaluation(AuthorNameEvaluation):
             'runtime_error_count': error_count,
             'total_runtime': total_runtime,
         }
+
+
+class AuthorEvenOddEvaluation(AuthorNameEvaluation):
+    def _prepare_test_set(self):
+        all_paper_author_names = []
+        for paper_group_idx in self.exp_split.value:
+            paper_author_names = get_paper_and_author_names_by_group_idx(paper_group_idx)
+            all_paper_author_names.extend(paper_author_names)
+
+        question_answers = []
+        for paper_name, author_names in all_paper_author_names:
+            question = f"Are there even or odd number of authors who wrote {paper_name}? " \
+                       f"Please answer 'even' or 'odd'."
+            question_answers.append((question, author_names))
+
+        return question_answers
+
+    def run(self):
+        # TODO: this can be optimized by doing batch inference
+        results = []
+        total_runtime = 0
+        with torch.no_grad():
+            for question, _ in tqdm.tqdm(self.question_answers):
+                try:
+                    start_runtime = datetime.datetime.now()
+                    results.append(self._get_result(question))
+                    end_runtime = datetime.datetime.now()
+                    total_runtime += (end_runtime - start_runtime).total_seconds()
+                except torch.cuda.OutOfMemoryError:
+                    self.logger.warning(f"OutOfMemoryError on {question}: skipping")
+                    results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
+
+        correct_count = 0
+        wrong_count = 0
+        format_error_count = 0
+        total_count = 0
+        error_count = 0
+        for result, (question, ref_authors) in zip(results, self.question_answers):
+            # 2. log details
+            # convert data in results to string
+            for k, v in result.items():
+                result[k] = str(v)
+            result['ref_authors'] = ref_authors
+
+            # 1. accumulate counts
+            total_count += 1
+            if 'error' in result:
+                error_count += 1
+                result['result'] = 'ERROR'
+                continue
+
+            direct_answer = result['answer'].lower()
+            correct_answer = 'even' if len(ref_authors) % 2 == 0 else 'odd'
+            wrong_answer = 'odd' if len(ref_authors) % 2 == 0 else 'even'
+
+            if correct_answer in direct_answer and wrong_answer in direct_answer:
+                format_error_count += 1
+            elif correct_answer in direct_answer:
+                correct_count += 1
+            elif wrong_answer in direct_answer:
+                wrong_count += 1
+            else:
+                format_error_count += 1
+
+        with open(f"{self.exp_dir}/results.json", 'w') as writer:
+            json.dump(results, writer, indent=4)
+
+        self.report = {
+            'total': total_count,
+            'correct_count': correct_count,
+            'wrong_count': wrong_count,
+            'format_error': format_error_count,
+            'runtime_error_count': error_count,
+            'total_runtime': total_runtime,
+        }
