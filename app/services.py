@@ -1,3 +1,4 @@
+import os
 import torch
 from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
@@ -5,7 +6,9 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTem
 from langchain.schema.messages import AIMessage, HumanMessage
 
 from model.customchain.chains import MyConversationalRetrievalChain
-from model.utils.setup_utils import get_llm, get_vector_db
+from model.utils.setup_utils import get_llm, resetVectorIndex, get_vector_db
+from model.utils import index_utils
+from config import config
 
 #ToDo SM (1) - Replace the custom chains with Runnables
 #ToDo SM (2) - Maintain chat history
@@ -51,3 +54,25 @@ def get_llm_answer(question):
     print(result)
 
     return result
+
+# Index new file
+def process_and_index_file(fileName):
+    #Index the file
+    index_utils.index_document(config.kb_index,fileName)
+
+    #Reset vector Index
+    resetVectorIndex()
+    print("DB Reloaded")
+
+    #File Deleted
+    delete_file(fileName)
+
+def delete_file(file_path: str):
+    """ Delete a file from the filesystem. """
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        return True
+    else:
+        print(f"The file {file_path} does not exist.")
+        return False
+

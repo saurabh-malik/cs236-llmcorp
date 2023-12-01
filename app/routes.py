@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.services import get_llm_answer
+from app.services import get_llm_answer, process_and_index_file
 from app.models import QuestionInput, AnswerOutput
 import os
 
@@ -19,4 +19,7 @@ async def upload_file(file: UploadFile = File(...)):
     with open(file_location, "wb+") as file_object:
         file_object.write(await file.read())
 
-    return {"info": "File uploaded successfully.", "filename": file.filename}
+    #Index File
+    process_and_index_file(file_location)
+
+    return {"info": "File uploaded and indexed successfully.", "filename": file.filename}
