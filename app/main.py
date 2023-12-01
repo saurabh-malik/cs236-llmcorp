@@ -15,4 +15,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def get_chat_page(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request})
 
+@app.get("/data-upload", response_class=HTMLResponse)
+async def get_chat_page(request: Request):
+    return templates.TemplateResponse("data-index.html", {"request": request})
+
 app.include_router(router)

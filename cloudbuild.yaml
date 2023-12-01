@@ -1,15 +1,39 @@
 steps:
+  # Check if the Docker image already exists
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Check Image'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if gcloud container images describe gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA > /dev/null 2>&1; then
+          echo "Image already exists. Skipping build and push."
+          echo "EXISTING_IMAGE=true" >> $BUILD_DIR/env_variables.txt
+        else
+          echo "Image does not exist. Proceeding with build and push."
+          echo "EXISTING_IMAGE=false" >> $BUILD_DIR/env_variables.txt
+        fi
+
   # Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build Image'
     args: ['build', '-t', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA', '.']
+    waitFor: ['-Check Image']
+    condition: '!$(cat $BUILD_DIR/env_variables.txt | grep EXISTING_IMAGE=true)'
 
   # Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push Image'
     args: ['push', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
+    waitFor: ['Build Image']
+    condition: '!$(cat $BUILD_DIR/env_variables.txt | grep EXISTING_IMAGE=true)'
 
   # Fetch GKE credentials
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', 'llmcorp-cluster-westus-4', '--zone', 'us-west4-a']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-west4-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
 
   # Check for the existence of the deployment and update if it exists
   - name: 'gcr.io/cloud-builders/gcloud'

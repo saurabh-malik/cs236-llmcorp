@@ -115,6 +115,20 @@
           animation: typing 1.5s infinite;
         }
 
+        .upload-link {
+            margin-left: 20px;
+            background-color: #f7f7f7;
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .upload-link:hover {
+            text-decoration: underline;
+        }
+
         .typing-indicator .dot:nth-child(1) {
           animation-delay: 0s;
         }
@@ -151,7 +165,7 @@
             color: #333; /* This is a placeholder color. Adjust as necessary. */
             font-weight: bold;
         }
-        
+
         @media only screen and (max-width: 600px) {
             #chat-container {
                 margin: 10px;
@@ -193,7 +207,9 @@
                 <path d="M7 16V20C7 21.1046 7.89543 22 9 22H10C11.1046 22 12 21.1046 12 20V16H7Z"/>
                 <path d="M17 16V20C17 21.1046 16.1046 22 15 22H14C12.8954 22 12 21.1046 12 20V16H17Z"/>
             </svg>
+
             <h1>Corp Chat</h1>
+            <a href="data-upload" class="upload-link">Upload PDF</a>
         </div>
         <div id="chat-messages">
             <!-- Chat messages will be displayed here -->
