@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ai-agent
-        image: gcr.io/ai-corp-agent/ai-agent:${BUILD_NUMBER}
+        image: gcr.io/ai-corp-agent/ai-agent:${SHORT_SHA}
         resources:
           limits:
             nvidia.com/gpu: 1 # requesting 1 GPU
