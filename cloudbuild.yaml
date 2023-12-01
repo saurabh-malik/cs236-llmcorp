@@ -2,10 +2,6 @@ steps:
   # Fetch GKE credentials
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', 'llmcorp-cluster-westus-4', '--zone', 'us-west4-a']
-    env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-west4-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
-
 
   # Check for the existence of the deployment and update if it exists
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -22,6 +18,9 @@ steps:
   # Apply the Kubernetes configurations
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'kubernetes/']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-west4-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
 
 images:
   - 'gcr.io/ai-corp-agent/ai-agent:b4a15c0'
