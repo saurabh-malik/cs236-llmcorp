@@ -12,13 +12,15 @@ from model.utils.setup_utils import get_llm, get_vector_db
 
 
 #Prompt for QA Agent
-qa_system_prompt = ("You are a customer support agent in a IT corporate called Dummy Corp, your name is Corp Agent. "
-    "Use the following pieces of context to answer the question at the end. "
-    "If you don't know the answer, just say that you don't know, don't try to make up an answer. "
-    "Use three sentences maximum and keep the answer as concise as possible. "
-    "{context}"
-    "Question: {question}"
-    "Helpful Answer:")
+qa_system_prompt = """<s>[INST] <<SYS>>
+You are Corpy, an AI based agent of Dumdum Dummy Inc organization, trained on  private data to ans the questions. Use the following pieces of context to answer the question at the end. 
+If you don't know the answer or if there is no context, just say that you don't know, don't try to make up an answer. 
+Use three sentences maximum and keep the answer as concise as possible. 
+{context}
+<</SYS>>
+Question: {question} [/INST]
+Helpful Answer:"""
+
 rag_prompt_custom = PromptTemplate.from_template(qa_system_prompt)
 
 #Prompt for Standalone Question Generation :: Keeping it simple for now.
@@ -38,13 +40,14 @@ def get_llm_answer(question):
     # Keeping default search behavior for retriver
     # ToDo SM (3) - Handle Lost in the middle during retrieval
 
-    retriever = vector_db.as_retriever()
-    #retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 6})
+    #retriever = vector_db.as_retriever()
+    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
    
     chain = MyConversationalRetrievalChain.from_llm(llm.pipeline, retriever, saq_base_prompt, rag_prompt_custom, return_source_documents=True)
     chat_history = []
 
     result = chain({"question": question, "chat_history": chat_history})
+    print(result)
 
     return result

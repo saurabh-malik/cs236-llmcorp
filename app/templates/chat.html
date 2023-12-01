@@ -151,6 +151,30 @@
             color: #333; /* This is a placeholder color. Adjust as necessary. */
             font-weight: bold;
         }
+        
+        @media only screen and (max-width: 600px) {
+            #chat-container {
+                margin: 10px;
+                width: auto;
+            }
+
+            #chat-header {
+                padding: 8px;
+            }
+
+            #chat-messages {
+                height: 300px;
+            }
+
+            #message-input, #send-button {
+                padding: 8px;
+            }
+
+            .message-bubble {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
