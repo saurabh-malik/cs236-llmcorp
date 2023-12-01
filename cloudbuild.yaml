@@ -1,4 +1,12 @@
 steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA', '.']
+
+  # Push the Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA']
+
   # Fetch GKE credentials
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', 'llmcorp-cluster-westus-4', '--zone', 'us-west4-a']
@@ -23,4 +31,4 @@ steps:
       - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
 
 images:
-  - 'gcr.io/ai-corp-agent/ai-agent:b4a15c0'
+  - 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA'
