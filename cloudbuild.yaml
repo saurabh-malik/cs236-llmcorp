@@ -11,17 +11,22 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', 'llmcorp-cluster-westus-4', '--zone', 'us-west4-a']
 
-  # Substitute environment variables and apply the Kubernetes deployment configurations
-  - name: 'gcr.io/cloud-builders/gcloud'
+ # Install required tools, substitute environment variables, and apply the Kubernetes deployment configurations
+  - name: 'ubuntu'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
+        apt-get update && apt-get install -y gettext-base curl
+        curl -LO "https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        mv ./kubectl /usr/local/bin/kubectl
         envsubst < kubernetes/deployment.yaml.template > kubernetes/deployment.yaml
         kubectl apply -f kubernetes/deployment.yaml
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west4-a'
       - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
+
 
   # Apply the Kubernetes service configurations
   - name: 'gcr.io/cloud-builders/kubectl'
