@@ -60,10 +60,42 @@
         <div class="upload-header">
             <h2>Upload PDF File</h2>
         </div>
-        <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="pdfFile" accept="application/pdf" required>
+        <form id="upload-form" class="upload-form">
+            <input type="file" id="pdfFile" name="pdfFile" accept="application/pdf" required>
             <button type="submit" class="upload-btn">Upload</button>
         </form>
+        <div id="upload-status"></div>
     </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('pdfFile');
+            const file = input.files[0];
+            if (!file) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('File upload failed');
+                }
+
+                const result = await response.json();
+                document.getElementById('upload-status').textContent = 'Upload successful: ' + result.filename;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('upload-status').textContent = 'Upload failed: ' + error.message;
+            }
+        });
+    </script>
 </body>
 </html>
