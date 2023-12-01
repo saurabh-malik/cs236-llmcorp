@@ -1,14 +1,15 @@
 import os
 
-from eval.evaluation_task import AuthorNameEvaluation, AuthorNameEvaluationNoRAG
+from eval.evaluation_task import (AuthorNameEvaluation, AuthorNameEvaluationNoRAG, SummaryEvaluation,
+                                  AuthorCountEvaluation, AuthorEvenOddEvaluation)
 from model.utils.data_utils import DataSplitGroup
 
 # 0. Configure the splits that will be used for evaluation
 EXP_SPLIT = DataSplitGroup.TEST
-EXP_RESULT_DIR = "experiments/eval_results_llama2_7b/"
-EXP_NAME = "author_name_qa_test"
+EXP_RESULT_DIR = "experiments/summary_eval_results_llama2_7b/"
+EXP_NAME = "summary_qa_test"
 # Create Evaluation task and run
-eval_task = AuthorNameEvaluation(EXP_NAME, EXP_RESULT_DIR, EXP_SPLIT)
+eval_task = SummaryEvaluation(EXP_NAME, EXP_RESULT_DIR, EXP_SPLIT)
 eval_task.setup()
 eval_task.run()
 eval_task.dump_result_json()

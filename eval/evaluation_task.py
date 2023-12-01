@@ -172,7 +172,7 @@ class SummaryEvaluation(EvaluationTaskBase):
 
         question_answers = []
         for paper_name, abstract in all_paper_abstracts:
-            question = f"Who are the authors of paper {paper_name}?"
+            question = f"Please summarize the paper {paper_name} in 100 to 200 words."
             question_answers.append((question, abstract))
 
         return question_answers
@@ -209,13 +209,13 @@ class SummaryEvaluation(EvaluationTaskBase):
             result.update(rouge_scores)
 
             for rouge_score_name in rouge_scores:
-                scores_total[rouge_score_name] += rouge_scores[rouge_score_name]
+                scores_total[rouge_score_name] += rouge_scores[rouge_score_name].fmeasure
 
         with open(f"{self.exp_dir}/results.json", 'w') as writer:
             json.dump(results, writer, indent=4)
 
         effective_test_number = len(self.question_answers) - error_count
-        average_scores = dict([(name, score / effective_test_number) for name, score in scores_total])
+        average_scores = dict([(name, score / effective_test_number) for name, score in scores_total.items()])
         self.report = {
             'total': len(self.question_answers),
             'error_count': error_count,
