@@ -64,7 +64,7 @@ Our RAG-based model is exposed through a REST API. Use the following endpoints:
 
 #### Web Application
 Access the web application at the root of your host URL. It provides a user-friendly interface to interact with our APIs.
-![Web Application Interface](http://34.16.178.254)
+
 
 3. **Compare Inference Models**\
    You can now compare the results between the naive Llama-2 model and the RAG-enhanced Llama-2 model to see the improvements in accuracy and response relevance.\
