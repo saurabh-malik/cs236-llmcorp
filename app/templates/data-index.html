@@ -76,6 +76,11 @@
         .reset-button:hover {
             background-color: #3b4f81;
         }
+        /* Style for the status message */
+        #reset-status {
+            margin-top: 10px;
+            font-style: italic;
+        }
         .drop-area {
             border: 2px dashed #007bff;
             border-radius: 5px;
@@ -160,6 +165,7 @@
         <button onclick="uploadFile()" class="upload-btn">Upload</button>
         <div id="upload-status"></div>
         <button id="reset-button" class="reset-button">Reset VectorDB</button>
+        <div id="reset-status"></div> 
     </div>
 
     <script>
@@ -289,11 +295,11 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert("VectorDB reset successful.");
+                document.getElementById('reset-status').textContent = "VectorDB reset successful.";
             })
             .catch(error => {
                 console.error('Error resetting VectorDB:', error);
-                alert("Error resetting VectorDB.");
+                document.getElementById('reset-status').textContent = "Error resetting VectorDB.";
             });
         });
     </script>
