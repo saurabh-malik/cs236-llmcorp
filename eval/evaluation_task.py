@@ -278,7 +278,7 @@ class AuthorCountEvaluation(AuthorNameEvaluation):
                 result['result'] = 'FORMAT ERROR'
                 format_error_count += 1
             else:
-                if int(number) == len(ref_authors):
+                if int(number[0]) == len(ref_authors):
                     result['result'] = 'CORRECT NUMBER'
                     correct_count += 1
                 else:
