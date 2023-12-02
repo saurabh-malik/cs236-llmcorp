@@ -5,12 +5,12 @@ import os
 
 router = APIRouter()
 
-@router.post("/get_answer", response_model=AnswerOutput)
+@router.post("/api/v1/get_answer", response_model=AnswerOutput)
 def get_answer(question_input: QuestionInput):
     llm_result = get_llm_answer(question_input.question)
     return AnswerOutput(answer=llm_result['answer'])
 
-@router.post("/upload")
+@router.post("/api/v1/upload")
 async def upload_file(file: UploadFile = File(...)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are accepted.")
@@ -24,7 +24,7 @@ async def upload_file(file: UploadFile = File(...)):
 
     return {"info": "File uploaded and indexed successfully.", "filename": file.filename}
 
-@router.post("/reset_vector_db")
+@router.post("/api/v1/reset_vector_db")
 def reset_vector_db():
     
     Reset_vector_db_index()
