@@ -6,7 +6,7 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTem
 from langchain.schema.messages import AIMessage, HumanMessage
 
 from model.customchain.chains import MyConversationalRetrievalChain
-from model.utils.setup_utils import get_llm, resetVectorIndex, get_vector_db
+from model.utils.setup_utils import get_llm, reload_VectorIndex, get_vector_db
 from model.utils import index_utils
 from config import config
 
@@ -60,12 +60,19 @@ def process_and_index_file(fileName):
     #Index the file
     index_utils.index_document(config.kb_index,fileName)
 
-    #Reset vector Index
-    resetVectorIndex()
-    print("DB Reloaded")
+    #Reload vector Index
+    reload_VectorIndex()
 
     #File Deleted
     delete_file(fileName)
+
+# Reset Index DB
+def Reset_vector_db_index():
+    #Reset Existing Vector Index to baseline
+    index_utils.reset_Index(config.kb_index, config.kb_index_baseline)
+    #Reload vector Index
+    reload_VectorIndex()
+
 
 def delete_file(file_path: str):
     """ Delete a file from the filesystem. """

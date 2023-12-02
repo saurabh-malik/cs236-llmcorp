@@ -62,6 +62,20 @@
         .upload-btn:hover {
             background-color: #3b4f81;
         }
+        /* Style for the reset button */
+        .reset-button {
+            background-color: #4a67a1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .reset-button:hover {
+            background-color: #3b4f81;
+        }
         .drop-area {
             border: 2px dashed #007bff;
             border-radius: 5px;
@@ -145,6 +159,7 @@
         <div class="upload-progress" id="upload-progress"></div>
         <button onclick="uploadFile()" class="upload-btn">Upload</button>
         <div id="upload-status"></div>
+        <button id="reset-button" class="reset-button">Reset VectorDB</button>
     </div>
 
     <script>
@@ -267,6 +282,20 @@
             }
         }, 100); // Adjust time interval as needed
     }
+
+    document.getElementById('reset-button').addEventListener('click', function() {
+            fetch('/reset_vector_db', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("VectorDB reset successful.");
+            })
+            .catch(error => {
+                console.error('Error resetting VectorDB:', error);
+                alert("Error resetting VectorDB.");
+            });
+        });
     </script>
 </body>
 </html>

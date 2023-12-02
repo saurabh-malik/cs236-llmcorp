@@ -70,3 +70,10 @@ def index_document(current_index_dir: str, file: str):
     db.save_local(current_index_dir)
     print("DB Merged and Saved")
 
+
+
+def reset_Index(current_index_dir: str, baseline_index_dir: str):
+    embeddings = get_default_embedding_model()
+    db = FAISS.load_local(baseline_index_dir, embeddings)
+    db.save_local(current_index_dir)
+
