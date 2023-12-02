@@ -11,21 +11,30 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', 'llmcorp-cluster-westus-4', '--zone', 'us-west4-a']
 
-  # Check for the existence of the deployment and update if it exists
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
+ # Use Alpine image to perform envsubst
+  - name: 'alpine'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
-        if kubectl get deployment ai-agent-deployment; then
-          kubectl set image deployment/ai-agent-deployment ai-agent=gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA
-        else
-          echo "Deployment not found, skipping image update."
-        fi
+        apk add --update gettext
+        envsubst < kubernetes/deployment.yaml.template > kubernetes/deployment.yaml
+    env:
+      - 'SHORT_SHA=$SHORT_SHA'
 
-  # Apply the Kubernetes configurations
+  # Apply the Kubernetes deployment configurations
   - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-f', 'kubernetes/']
+    args: ['apply', '-f', 'kubernetes/deployment.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-west4-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
+
+  # Apply the Kubernetes service configurations
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'kubernetes/service.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-west4-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=llmcorp-cluster-westus-4'
 
 images:
   - 'gcr.io/ai-corp-agent/ai-agent:$SHORT_SHA'

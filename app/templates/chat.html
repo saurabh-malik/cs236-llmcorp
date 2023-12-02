@@ -21,13 +21,43 @@
         }
         #chat-header {
             display: flex;
-            align-items: center; /* This ensures vertical centering */
-            justify-content: center; /* This centers the content horizontally */
-            background-color: #007bff; /* Example blue background */
-            color: #ffffff; /* Text color */
-            padding: 10px; /* Add some padding */
-            /* Add other styling as needed */
+            align-items: center;
+            justify-content: space-between; /* Adjusts space distribution */
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px;
         }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centering content */
+            flex-grow: 1; /* Allows the content to grow and take available space */
+        }
+
+        .header-logo {
+            width: 50px; /* Adjust as needed */
+            height: 50px; /* Adjust as needed */
+            border-radius: 50%; /* Makes it round */
+            margin-right: 10px;
+        }
+
+        .header-title {
+            text-align: center;
+        }
+
+        .upload-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .upload-icon {
+            width: 45px; /* Adjust as needed */
+            height: 45px; /* Adjust as needed */
+            border-radius: 50%; /* Makes it round */
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
         #chat-messages {
             height: 400px;
             overflow-y: auto;
@@ -151,25 +181,45 @@
             color: #333; /* This is a placeholder color. Adjust as necessary. */
             font-weight: bold;
         }
+
+        @media only screen and (max-width: 600px) {
+            #chat-container {
+                margin: 10px;
+                width: auto;
+            }
+
+            #chat-header {
+                padding: 8px;
+            }
+
+            #chat-messages {
+                height: 300px;
+            }
+
+            #message-input, #send-button {
+                padding: 8px;
+            }
+
+            .message-bubble {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="chat-container">
         <div id="chat-header">
-            <svg class="chat-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Stylized brain icon -->
-                <path d="M13 2C13 3.65685 14.3431 5 16 5C17.6569 5 19 3.65685 19 2H13Z"/>
-                <path d="M11 2C11 3.65685 9.65685 5 8 5C6.34315 5 5 3.65685 5 2H11Z"/>
-                <path d="M2 9C2 6.23858 4.23858 4 7 4V14C4.23858 14 2 11.7614 2 9Z"/>
-                <path d="M22 9C22 6.23858 19.7614 4 17 4V14C19.7614 14 22 11.7614 22 9Z"/>
-                <path d="M7 4C8.65685 4 10 5.34315 10 7C10 8.65685 8.65685 10 7 10V4Z"/>
-                <path d="M17 4C15.3431 4 14 5.34315 14 7C14 8.65685 15.3431 10 17 10V4Z"/>
-                <path d="M7 10C5.34315 10 4 11.3431 4 13C4 14.6569 5.34315 16 7 16H10C10 14.3431 8.65685 13 7 13V10Z"/>
-                <path d="M17 10C18.6569 10 20 11.3431 20 13C20 14.6569 18.6569 16 17 16H14C14 14.3431 15.3431 13 17 13V10Z"/>
-                <path d="M7 16V20C7 21.1046 7.89543 22 9 22H10C11.1046 22 12 21.1046 12 20V16H7Z"/>
-                <path d="M17 16V20C17 21.1046 16.1046 22 15 22H14C12.8954 22 12 21.1046 12 20V16H17Z"/>
-            </svg>
-            <h1>Corp Chat</h1>
+           <!-- Header Content -->
+            <div class="header-content">
+                <img src="static/chat.png" alt="Corp Chat Logo" class="header-logo">
+                <h1>Corp Chat</h1>
+            </div>
+
+            <!-- Upload link -->
+            <a href="data-upload" class="upload-link">
+                <img src="static/upload.png" alt="Upload" class="upload-icon">
+            </a>
         </div>
         <div id="chat-messages">
             <!-- Chat messages will be displayed here -->

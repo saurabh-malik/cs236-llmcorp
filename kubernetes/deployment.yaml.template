@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-agent-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-agent
+  template:
+    metadata:
+      labels:
+        app: ai-agent
+    spec:
+      containers:
+      - name: ai-agent
+        image: gcr.io/ai-corp-agent/ai-agent:${SHORT_SHA}
+        resources:
+          limits:
+            nvidia.com/gpu: 1 # requesting 1 GPU
+        ports:
+        - containerPort: 8000
