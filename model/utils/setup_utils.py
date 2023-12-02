@@ -103,7 +103,7 @@ def get_vector_db_on_split(
     return loaded_vector_db
 
 
-def resetVectorIndex():
+def reload_VectorIndex():
     global vector_db
     vector_db = None
     get_vector_db()

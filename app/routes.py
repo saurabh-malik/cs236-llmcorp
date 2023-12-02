@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.services import get_llm_answer, process_and_index_file
+from app.services import get_llm_answer, process_and_index_file, Reset_vector_db_index
 from app.models import QuestionInput, AnswerOutput
 import os
 
@@ -23,3 +23,10 @@ async def upload_file(file: UploadFile = File(...)):
     process_and_index_file(file_location)
 
     return {"info": "File uploaded and indexed successfully.", "filename": file.filename}
+
+@router.post("/reset_vector_db")
+def reset_vector_db():
+    
+    Reset_vector_db_index()
+    return {"message": "VectorDB index has been successfully reset."}
+    
