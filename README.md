@@ -44,7 +44,8 @@ Ensure you have the following installed on your system:
 ### Usage
 #### Running the Model
 - **Without Docker**: Run the model directly by executing:
-  ``` python main.py
+  ```sh
+  python main.py
 - **With Docker**: Run the docker container.
   Make sure you assign your host GPUs to your container (use --gpus flag as shown below)
    ```sh
