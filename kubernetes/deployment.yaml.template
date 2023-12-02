@@ -17,6 +17,6 @@ spec:
         image: gcr.io/ai-corp-agent/ai-agent:${SHORT_SHA}
         resources:
           limits:
-            nvidia.com/gpu: 1 # requesting 1 GPU
+            nvidia.com/gpu: 0.5 # requesting 0.5 GPU
         ports:
         - containerPort: 8000
