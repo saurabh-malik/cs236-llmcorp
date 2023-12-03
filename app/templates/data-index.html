@@ -240,7 +240,7 @@
 
         try {
             const request = new XMLHttpRequest();
-            request.open("POST", "/upload", true);
+            request.open("POST", "/api/v1/upload", true);
 
             request.upload.onprogress = function (e) {
                 if (e.lengthComputable) {
@@ -253,6 +253,8 @@
                 if (request.status === 200) {
                     updateProgressBar(50); // Start from 50% for API processing
                     simulateApiProcessing(); // Simulate API processing or implement actual status checks
+                     input.value = '';
+                     fileInfo.textContent = '';
                 } else {
                     throw new Error('File upload failed');
                 }
@@ -290,7 +292,7 @@
     }
 
     document.getElementById('reset-button').addEventListener('click', function() {
-            fetch('/reset_vector_db', {
+            fetch('/api/v1/reset_vector_db', {
                 method: 'POST'
             })
             .then(response => response.json())

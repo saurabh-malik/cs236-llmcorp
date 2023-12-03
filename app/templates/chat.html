@@ -256,7 +256,7 @@
                 messageInput.value = "";
 
                 // Send user message to the server
-                const response = await fetch("/get_answer", {
+                const response = await fetch("/api/v1/get_answer", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
