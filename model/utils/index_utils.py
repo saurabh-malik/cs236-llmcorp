@@ -77,3 +77,12 @@ def reset_Index(current_index_dir: str, baseline_index_dir: str):
     db = FAISS.load_local(baseline_index_dir, embeddings)
     db.save_local(current_index_dir)
 
+def index_web_content(index_dir, documents):
+    #Get Default Embeddings
+    embeddings = get_default_embedding_model()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+    splits = text_splitter.split_documents(documents)
+    db = FAISS.from_documents(splits, embeddings)
+    db.save_local(index_dir)
+    db.save_local(index_dir+"_baseline")

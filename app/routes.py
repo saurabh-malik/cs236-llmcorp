@@ -1,7 +1,8 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.services import get_llm_answer, process_and_index_file, Reset_vector_db_index
-from app.models import QuestionInput, AnswerOutput
 import os
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from app.services import get_llm_answer, process_and_index_file, Reset_vector_db_index, crawl_index_website
+from app.models import QuestionInput, AnswerOutput, CrawlRequest
+
 
 router = APIRouter()
 
@@ -30,3 +31,17 @@ def reset_vector_db():
     Reset_vector_db_index()
     return {"message": "VectorDB index has been successfully reset."}
     
+
+@router.post("/crawl_website")
+async def crawl_website(request: CrawlRequest):
+    url = request.url
+    # Implement the logic to crawl the website
+    # This might involve calling a function that handles the crawling process
+    try:
+        # crawl_result = await perform_crawling(url)
+        crawl_index_website(url)
+        return {"message": "Website indexed successfully."}
+    except Exception as e:
+        # Catch any exceptions raised during the crawling process
+        raise HTTPException(status_code=500, detail=str(e))
+

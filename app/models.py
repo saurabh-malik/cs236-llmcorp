@@ -5,3 +5,6 @@ class QuestionInput(BaseModel):
 
 class AnswerOutput(BaseModel):
     answer: str
+
+class CrawlRequest(BaseModel):
+    url: str
