@@ -52,7 +52,6 @@ def get_llm():
 def get_vector_db():
     global vector_db
     if vector_db is None:
-        print("Vector DB is NUll")
         device = f'cuda:{torch.cuda.current_device()}' if torch.cuda.is_available() else 'cpu'
         embeddings = HuggingFaceEmbeddings(
             model_name=config.embedding_model,
@@ -60,7 +59,6 @@ def get_vector_db():
         )
 
         vector_db = MyFAISS.load_local(config.kb_index, embeddings)
-    print("Vector DB is Loaded")
     return vector_db
 
 
