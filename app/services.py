@@ -49,7 +49,7 @@ def get_llm_answer(question):
     # ToDo SM (3) - Handle Lost in the middle during retrieval
 
     #retriever = vector_db.as_retriever()
-    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
    
     chain = MyConversationalRetrievalChain.from_llm(llm.pipeline, retriever, saq_base_prompt, rag_prompt_custom, return_source_documents=False)
