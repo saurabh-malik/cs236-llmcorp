@@ -83,6 +83,6 @@ def index_web_content(index_dir, documents):
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     splits = text_splitter.split_documents(documents)
-    db = FAISS.from_documents(documents, embeddings)
+    db = FAISS.from_documents(splits, embeddings)
     db.save_local(index_dir)
     db.save_local(index_dir+"_baseline")
