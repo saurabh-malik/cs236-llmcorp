@@ -28,7 +28,7 @@ def get_domain(url):
     return parsed_url.netloc
 
 def filter_urls(dataset_item):
-    excluded_urls = ["https://www.globallogic.com/hr/", "https://www.globallogic.com/jp/", "https://www.globallogic.com/de/", "https://www.globallogic.com/in/", "https://www.globallogic.com/il/", "https://www.globallogic.com/latam/", "https://www.globallogic.com/se/", "https://www.globallogic.com/pl/", "https://www.globallogic.com/ro/", "https://www.globallogic.com/sk/","https://www.globallogic.com/ua/","https://www.globallogic.com/uk/",]
+    excluded_urls = ["https://www.globallogic.com/hr/", "https://www.globallogic.com/insights/blogs/", "https://www.globallogic.com/jp/", "https://www.globallogic.com/de/", "https://www.globallogic.com/in/", "https://www.globallogic.com/il/", "https://www.globallogic.com/latam/", "https://www.globallogic.com/se/", "https://www.globallogic.com/pl/", "https://www.globallogic.com/ro/", "https://www.globallogic.com/sk/","https://www.globallogic.com/ua/","https://www.globallogic.com/uk/",]
     url = dataset_item.get("url", "")
     if not any(excluded_url in url for excluded_url in excluded_urls):
         return Document(

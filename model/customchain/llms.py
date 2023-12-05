@@ -63,7 +63,7 @@ class MyHuggingFacePipeline:
             return_full_text=True,
             task='text-generation',
             stopping_criteria=stopping_criteria,
-            temperature=0.1,
+            temperature=0.09,
             max_new_tokens=512,
             repetition_penalty=1.1
         )
