@@ -22,7 +22,6 @@ import transformers
 llm = None
 vector_db = None
 
-
 logger = activate_logger('setup_utils')
 
 
@@ -107,3 +106,26 @@ def reload_VectorIndex():
     global vector_db
     vector_db = None
     get_vector_db()
+
+
+CONTEXT = \
+f"""
+You have no prior knowledge, and need to use utility functions below to retrieve information:
+
+* get_paper_authors(paper_name: str) -> List[str]. 
+  The function takes `paper_name` as input parameter and gives a list of strings that are the names of paper authors. If the paper cannot be found, an empty list will be returned.
+* get_paper_abstract(paper_name: str) -> List[str].
+  The function takes `paper_name` as input parameter and gives the paper abstract as string. If the paper cannot be found, an empty list will be returned.
+* You can also use all other python 3 native functions
+
+If you'd like to use them, please embed the function call in your answer like `<begin_call>python_func_call()<end_call>`, and I will evaluate python codes between `<begin_call>` and `<end_call>`. The output of python codes embedded should be a single string.
+For example:
+Question: Who are the authors of paper "Attention is All You Need"?
+Answer: The authors are <begin_call>str(get_paper_authors("Attention is All You Need"))<end_call>.
+Question: How many authors are there in paper "Can acoustic early dark energy still resolve the Hubble tension"
+Answer: There are <begin_call>str(len(get_paper_authors("Can acoustic early dark energy still resolve the Hubble tension")))<end_call> authors.
+Question: Are there even number or odd number of authors in paper "Can acoustic early dark energy still resolve the Hubble tension"
+Answer: There are <begin_call>"even" if len(get_paper_authors("Can acoustic early dark energy still resolve the Hubble tension")) % 2 == 0 else "odd"<end_call> authors.
+Question: Please summarize paper "Can acoustic early dark energy still resolve the Hubble tension"
+Answer: <begin_call>get_paper_abstract("Can acoustic early dark energy still resolve the Hubble tension")<end_call>
+"""

@@ -204,7 +204,7 @@ class SummaryEvaluation(EvaluationTaskBase):
                 result[k] = str(v)
             result['ref_abstract'] = ref_abstract
 
-            direct_answer = result['answer']
+            direct_answer = result.get('answer', "")
             rouge_scores = scorer.score(ref_abstract, direct_answer)
             result.update(rouge_scores)
 
