@@ -20,6 +20,7 @@ class MyConversationalRetrievalChain(ConversationalRetrievalChain):
                 llm,
                 retriever,
                 return_source_documents=return_source_documents,
+                combine_docs_chain_kwargs={'prompt': prompt}
             )
         #chain = ConversationalRetrievalChain.from_llm(llm, retriever, return_source_documents=return_source_documents, combine_docs_chain_kwargs={'prompt': prompt})
         return chain

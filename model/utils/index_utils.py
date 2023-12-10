@@ -59,7 +59,7 @@ def index_document(current_index_dir: str, file: str):
     texts = loader.load()
     print(len(texts))
     print(texts)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
     splits = text_splitter.split_documents(texts)
     print(len(splits))
     print(splits)
@@ -78,3 +78,12 @@ def reset_Index(current_index_dir: str, baseline_index_dir: str):
     db = FAISS.load_local(baseline_index_dir, embeddings)
     db.save_local(current_index_dir)
 
+def index_web_content(index_dir, documents):
+    #Get Default Embeddings
+    embeddings = get_default_embedding_model()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    splits = text_splitter.split_documents(documents)
+    db = FAISS.from_documents(splits, embeddings)
+    db.save_local(index_dir)
+    db.save_local(index_dir+"_baseline")

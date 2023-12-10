@@ -13,5 +13,6 @@ torch==2.1.0
 rouge-score==0.1.2
 python-multipart
 pypdf
+apify_client
 pydantic~=2.4.2
 tqdm~=4.66.1

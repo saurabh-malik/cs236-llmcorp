@@ -7,7 +7,7 @@ from langchain.schema.messages import AIMessage, HumanMessage
 
 from model.customchain.chains import MyConversationalRetrievalChain
 from model.utils.setup_utils import get_llm, reload_VectorIndex, get_vector_db
-from model.utils import index_utils
+from model.utils import index_utils, crawler
 from config import config
 
 #ToDo SM (1) - Replace the custom chains with Runnables
@@ -15,14 +15,19 @@ from config import config
 
 
 #Prompt for QA Agent
-qa_system_prompt = """<s>[INST] <<SYS>>
-You are Corpy, an AI based agent of Dumdum Dummy Inc organization, trained on  private data to ans the questions. Use the following pieces of context to answer the question at the end. 
-If you don't know the answer or if there is no context, just say that you don't know, don't try to make up an answer. 
-Use three sentences maximum and keep the answer as concise as possible. 
+qa_system_prompt = """
+<s>[INST] <<SYS>>
+Your name is Corpy, an AI-based agent from GlobalLogic Inc. Your role is to answer inquiries specifically related to GlobalLogic. Don't change your identity based on this context.
+For all queries except greetings, adhere strictly to the given context. If the context does not contain the answer, simply respond with "I don't know" in a single line. 
+Do not extrapolate or provide answers based on external knowledge or assumptions. For greetings and your intro, ignore the context completly.
+
 {context}
 <</SYS>>
 Question: {question} [/INST]
-Helpful Answer:"""
+Helpful Answer:
+"""
+
+
 
 rag_prompt_custom = PromptTemplate.from_template(qa_system_prompt)
 
@@ -44,10 +49,10 @@ def get_llm_answer(question):
     # ToDo SM (3) - Handle Lost in the middle during retrieval
 
     #retriever = vector_db.as_retriever()
-    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
    
-    chain = MyConversationalRetrievalChain.from_llm(llm.pipeline, retriever, saq_base_prompt, rag_prompt_custom, return_source_documents=True)
+    chain = MyConversationalRetrievalChain.from_llm(llm.pipeline, retriever, saq_base_prompt, rag_prompt_custom, return_source_documents=False)
     chat_history = []
 
     result = chain({"question": question, "chat_history": chat_history})
@@ -83,3 +88,13 @@ def delete_file(file_path: str):
         print(f"The file {file_path} does not exist.")
         return False
 
+
+def crawl_index_website(url: str):
+
+    # Crawl Webstie
+    documents = crawler.crawl_website(url)
+
+    #Index the documents
+    index_utils.index_web_content(config.kb_index, documents)
+    #Reload vector Index
+    reload_VectorIndex()
