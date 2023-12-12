@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 from pandas_ods_reader import read_ods
 from openai import OpenAI
+from config_ft import config
 
 # Function to generate question and answer
 def generate_question_and_answer(client, text, engine='text-davinci-003', q_max_tokens=50, a_max_tokens=150):
@@ -58,7 +59,7 @@ def prepare_finetune_data(df, output_file_path):
 
 def main():
     # Set your OpenAI API key
-    os.environ["OPENAI_API_KEY"] = "your-api-key"
+    os.environ["OPENAI_API_KEY"] = config.api_key
 
     # Check command line argument
     if len(sys.argv) < 2:
