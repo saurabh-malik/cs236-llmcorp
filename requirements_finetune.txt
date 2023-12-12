@@ -1,0 +1,9 @@
+transformers
+accelerate
+peft
+bitsandbytes
+trl
+scipy
+tensorboardX
+papdas_ods_reader
+openAI
