@@ -8,6 +8,7 @@ import argparse
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
+from config import config
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--kb', type=str, default='faiss_200_papers_index', help="Vector DB Index for your knowledge base")
@@ -30,7 +31,7 @@ with torch.no_grad():
     )
 
     # begin initializing HF items, you need an access token
-    hf_auth = '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'
+    hf_auth = config.hf_auth
     model_config = transformers.AutoConfig.from_pretrained(
         model_id,
         use_auth_token=hf_auth
