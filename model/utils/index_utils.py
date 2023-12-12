@@ -4,6 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores.faiss import FAISS
 from langchain.document_loaders import PyPDFLoader
 
+
 def get_default_embedding_model():
     model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {"device": "cuda"}
