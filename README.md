@@ -108,6 +108,11 @@ python3 -m eval.run_eval
 ```
 In `eval/evaluation_task.py` and `eval/evaluation_task_tool.py`, you can find different evaluation tasks. Simply import and use the one you'd like to run in `run_eval.py`, and you will see the result in experiment folder.
 
+## Future Work
+1. Improve retrieval procedd for higher accuracy before generating data
+2. Create stand alone questions based on history and questions
+3. Data quality control ingested
+
 ## Contributing
 
 If you're interested in contributing, please follow these steps:
