@@ -101,6 +101,13 @@ Thanks to our containerized chat application and LLM model, we can deploy it on 
 - **Google Cloud Deployment**: 
 The application is currently deployed and accessible at: [http://34.16.178.254/](http://34.16.178.254/)
 
+## Experiments and Evaluations
+To run evaluation tasks, simply run command below in repo root dir after setting everything up.
+```bash
+python3 -m eval.run_eval
+```
+In `eval/evaluation_task.py` and `eval/evaluation_task_tool.py`, you can find different evaluation tasks. Simply import and use the one you'd like to run in `run_eval.py`, and you will see the result in experiment folder.
+
 ## Contributing
 
 If you're interested in contributing, please follow these steps:
