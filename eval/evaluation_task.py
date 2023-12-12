@@ -172,7 +172,7 @@ class SummaryEvaluation(EvaluationTaskBase):
 
         question_answers = []
         for paper_name, abstract in all_paper_abstracts:
-            question = f"Who are the authors of paper {paper_name}?"
+            question = f"Please summarize the paper {paper_name} in 100 to 200 words."
             question_answers.append((question, abstract))
 
         return question_answers
@@ -204,18 +204,18 @@ class SummaryEvaluation(EvaluationTaskBase):
                 result[k] = str(v)
             result['ref_abstract'] = ref_abstract
 
-            direct_answer = result['answer']
+            direct_answer = result.get('answer', "")
             rouge_scores = scorer.score(ref_abstract, direct_answer)
             result.update(rouge_scores)
 
             for rouge_score_name in rouge_scores:
-                scores_total[rouge_score_name] += rouge_scores[rouge_score_name]
+                scores_total[rouge_score_name] += rouge_scores[rouge_score_name].fmeasure
 
         with open(f"{self.exp_dir}/results.json", 'w') as writer:
             json.dump(results, writer, indent=4)
 
         effective_test_number = len(self.question_answers) - error_count
-        average_scores = dict([(name, score / effective_test_number) for name, score in scores_total])
+        average_scores = dict([(name, score / effective_test_number) for name, score in scores_total.items()])
         self.report = {
             'total': len(self.question_answers),
             'error_count': error_count,
@@ -278,7 +278,7 @@ class AuthorCountEvaluation(AuthorNameEvaluation):
                 result['result'] = 'FORMAT ERROR'
                 format_error_count += 1
             else:
-                if int(number) == len(ref_authors):
+                if int(number[0]) == len(ref_authors):
                     result['result'] = 'CORRECT NUMBER'
                     correct_count += 1
                 else:
@@ -371,3 +371,82 @@ class AuthorEvenOddEvaluation(AuthorNameEvaluation):
             'runtime_error_count': error_count,
             'total_runtime': total_runtime,
         }
+
+
+class CoTAuthorCountEvaluation(AuthorCountEvaluation):
+    def _get_result(self, paper_name):
+        first_part_result = self.chain({"question": f"Who are the authors of paper {paper_name}?", "chat_history": []})
+        return self.chain({"question": "How many authors are there? Please answer with a single arabic number.",
+                           "chat_history": [f"Who are the authors of paper {paper_name}", first_part_result['answer']]})
+    def _prepare_test_set(self):
+        all_paper_author_names = []
+        for paper_group_idx in self.exp_split.value:
+            paper_author_names = get_paper_and_author_names_by_group_idx(paper_group_idx)
+            all_paper_author_names.extend(paper_author_names)
+
+        question_answers = []
+        for paper_name, author_names in all_paper_author_names:
+            question_answers.append((paper_name, author_names))
+
+        return question_answers
+
+    def run(self):
+        # TODO: this can be optimized by doing batch inference
+        results = []
+        total_runtime = 0
+        with torch.no_grad():
+            for question, _ in tqdm.tqdm(self.question_answers):
+                try:
+                    start_runtime = datetime.datetime.now()
+                    results.append(self._get_result(question))
+                    end_runtime = datetime.datetime.now()
+                    total_runtime += (end_runtime - start_runtime).total_seconds()
+                except torch.cuda.OutOfMemoryError:
+                    self.logger.warning(f"OutOfMemoryError on {question}: skipping")
+                    results.append({'question': question, 'error': 'torch.cuda.OutOfMemoryError'})
+
+        correct_count = 0
+        wrong_count = 0
+        format_error_count = 0
+        total_count = 0
+        error_count = 0
+        for result, (question, ref_authors) in zip(results, self.question_answers):
+            # 2. log details
+            # convert data in results to string
+            for k, v in result.items():
+                result[k] = str(v)
+            result['ref_authors'] = ref_authors
+
+            # 1. accumulate counts
+            total_count += 1
+            if 'error' in result:
+                error_count += 1
+                result['result'] = 'ERROR'
+                continue
+
+            direct_answer = result['answer']
+            number = re.search(r'\d+', direct_answer)
+            if number is None:
+                result['result'] = 'FORMAT ERROR'
+                format_error_count += 1
+            else:
+                if int(number) == len(ref_authors):
+                    result['result'] = 'CORRECT NUMBER'
+                    correct_count += 1
+                else:
+                    result['result'] = 'WRONG NUMBER'
+                    wrong_count += 1
+
+        with open(f"{self.exp_dir}/results.json", 'w') as writer:
+            json.dump(results, writer, indent=4)
+
+        self.report = {
+            'total': total_count,
+            'correct_count': correct_count,
+            'wrong_count': wrong_count,
+            'format_error': format_error_count,
+            'runtime_error_count': error_count,
+            'total_runtime': total_runtime,
+        }
+
+
