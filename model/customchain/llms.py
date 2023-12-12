@@ -19,6 +19,7 @@ class MyHuggingFacePipeline:
     def load_model(self, model_id, hf_auth):
         
         device = f'cuda:{torch.cuda.current_device()}' if torch.cuda.is_available() else 'cpu'
+        new_model = config.fine_tuned_model
 
         with torch.no_grad():
             # set quantization configuration to load a large model with less GPU memory
@@ -29,20 +30,31 @@ class MyHuggingFacePipeline:
                 bnb_4bit_use_double_quant=True,
                 bnb_4bit_compute_dtype=torch.bfloat16
             )
+            
+            if config.use_custom_model:
+            # Load the Fine-tuned model
+                model = AutoModelForCausalLM.from_pretrained(
+                    new_model,
+                    trust_remote_code=True,
+                    quantization_config=bnb_config,
+                    device_map='auto'
+                )
+            else:
+                # Load the base model from HuggingFace
+                model_config = AutoConfig.from_pretrained(
+                    model_id,
+                    use_auth_token=hf_auth
+                )
 
-            model_config = AutoConfig.from_pretrained(
-                model_id,
-                use_auth_token=hf_auth
-            )
-
-            model = AutoModelForCausalLM.from_pretrained(
-                model_id,
-                trust_remote_code=True,
-                config=model_config,
-                quantization_config=bnb_config,
-                device_map='auto',
-                use_auth_token=hf_auth
-            )
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_id,
+                    trust_remote_code=True,
+                    config=model_config,
+                    quantization_config=bnb_config,
+                    device_map='auto',
+                    use_auth_token=hf_auth
+                )
+            
 
             # enable evaluation mode to allow model inference
             model.eval()
@@ -56,6 +68,8 @@ class MyHuggingFacePipeline:
             model_id,
             use_auth_token=hf_auth
         )
+        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
 
         pipeline = transformers.pipeline(
             model=self.model,

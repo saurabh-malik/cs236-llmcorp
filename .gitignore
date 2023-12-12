@@ -119,6 +119,11 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+#Train logs
+results/
+
+#finetuned model
+model/fine-tuned/
 # Environments
 .env
 .venv
@@ -128,6 +133,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+env-finetune/
 
 # Spyder project settings
 .spyderproject
