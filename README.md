@@ -1,5 +1,7 @@
 # Corporate LLM Integration Project
 
+![poster](CS%20236%20Corp%20LLM%20Poster.png "Result Poster")
+
 ## Overview
 This project aims to integrate Language Model Learning (LLM) technologies into corporate environments, with a focus on the Llama-2 model. The integration addresses key challenges such as data confidentiality, model hallucinations, and the need for domain-specific responses. Using a dual-strategy approach, we combine the Retrieval-Augmented Generation (RAG) method with fine-tuning on corporate-specific data to ensure accuracy, data security, and reliable model responses.
 
